@@ -1,0 +1,1 @@
+export const Black = "#1e1f22"
