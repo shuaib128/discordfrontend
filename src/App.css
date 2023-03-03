@@ -1,4 +1,14 @@
-body{
+body {
     margin: 0;
     padding: 0;
+}
+
+textarea:focus,
+input:focus {
+    outline: none;
+}
+
+.search-input::placeholder{
+    font-size: 14px;
+    color: #b9b9b9;
 }

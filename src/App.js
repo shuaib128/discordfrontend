@@ -2,9 +2,12 @@ import './App.css';
 import { Routes, Route } from "react-router-dom"
 import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
-import { Black } from './utilits/Colors/Colors';
+import { Black, BlackLight } from './utilits/Colors/Colors';
 import { Typography } from '@mui/material'
 import Grid from '@mui/material/Grid';
+import Main from './components/SidePannelOne/Main';
+import MainPannelTwo from './components/SidePannelTwo/Main';
+import MainPannelFour from './components/SidePannelFour/MainPannelFour';
 //Pages
 import Home from './Pages/Home';
 import UserSetting from './Pages/UserSetting';
@@ -12,35 +15,40 @@ import DirectMessages from './Pages/DirectMessages';
 
 function App() {
   return (
-    <Box>
+    <Box sx={{ height: "100vh", overflow: "hidden" }}>
       <Box
         sx={{
           backgroundColor: Black,
           height: "auto"
         }}
       >
-        <Typography variant="subtitle2" gutterBottom color="white">
-          <Container maxWidth={false} sx={{ paddingY: 0.3 }}>
+        <Container maxWidth={false} sx={{ paddingY: 0.4 }}>
+          <Typography variant="subtitle2" gutterBottom color="white">
             Discord
-          </Container>
-        </Typography>
+          </Typography>
+        </Container>
       </Box>
 
-      <Container maxWidth={false}>
-        <Grid container gap={7}>
-          <Grid item>
-            <Typography variant="h6" gutterBottom>
-              Grid one
-            </Typography>
+      <Box>
+        <Grid
+          container 
+          sx={{
+            gridTemplateColumns: "auto auto 1fr auto", 
+            width: "100%", 
+            display: "grid"
+          }}
+        >
+          <Grid item sx={{ backgroundColor: Black, height: "100vh" }}>
+            <Container maxWidth={false}>
+              <Main />
+            </Container>
           </Grid>
 
-          <Grid item>
-            <Typography variant="h6" gutterBottom>
-              Grid two
-            </Typography>
+          <Grid item sx={{ backgroundColor: BlackLight }}>
+            <MainPannelTwo />
           </Grid>
 
-          <Grid item>
+          <Grid item sx={{ backgroundColor: "#2e3035" }}>
             <Container maxWidth={false}>
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -55,8 +63,12 @@ function App() {
               </Routes>
             </Container>
           </Grid>
+
+          <Grid item sx={{ backgroundColor: "#232428" }}>
+            <MainPannelFour />
+          </Grid>
         </Grid>
-      </Container>
+      </Box>
     </Box >
   );
 }
