@@ -6,7 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button';
 import MessagesOption from './MessagesOption';
 
-const MessagesOptions = () => {
+const MessagesOptions = (props) => {
     return (
         <Box sx={{ marginTop: "14px" }}>
             <Box sx={{
@@ -22,7 +22,7 @@ const MessagesOptions = () => {
                     Direct Messages
                 </Typography>
 
-                <Button>
+                <Button onClick={props.handleOpen}>
                     <AddIcon
                         style={{
                             color: "white",

@@ -1,14 +1,19 @@
 import React from 'react'
-import { Typography } from '@mui/material'
+import { Box } from '@mui/system';
+import MessageInputBox from '../components/Message/MessageInputBox'
+import MessageTop from '../components/Message/MessageTop';
 
 function Home() {
     return (
-        <div>
-            <Typography variant="subtitle1" gutterBottom>
-                subtitle1. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-                blanditiis tenetur
-            </Typography>
-        </div>
+        <Box 
+            sx={{
+                position: "relative",
+                height: "100vh"
+            }}
+        >
+            <MessageTop />
+            <MessageInputBox />
+        </Box>
     )
 }
 

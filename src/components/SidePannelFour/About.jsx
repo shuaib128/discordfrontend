@@ -57,6 +57,7 @@ const About = () => {
                     variant="overline"
                     gutterBottom
                     color="white"
+                    lineHeight="25px"
                 >
                     Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
                     blanditiis tenetur und.

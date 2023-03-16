@@ -3,9 +3,9 @@ import { Box } from '@mui/system'
 import Avatar from '@mui/material/Avatar';
 import { Typography } from '@mui/material'
 import { BlackLightMore } from '../../utilits/Colors/Colors';
-import { StyledBadge } from './ActiveIndicatorAvatar';
+import { StyledBadge } from '../SidePannelTwo/ActiveIndicatorAvatar';
 
-const MessagesOption = ({ Name, Image }) => {
+const CommonServers = ({ Name, Image }) => {
     const [Hovered, setHovered] = useState(false)
 
     return (
@@ -40,13 +40,13 @@ const MessagesOption = ({ Name, Image }) => {
             <Typography
                 variant="subtitle2"
                 gutterBottom
-                color='white'
+                color={Hovered ? "white" : "black"}
                 ml='15px'
             >
-                {Name}
+                carlos.dev2002
             </Typography>
         </Box>
     )
 }
 
-export default MessagesOption
+export default CommonServers

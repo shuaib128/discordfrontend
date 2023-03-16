@@ -4,6 +4,7 @@ import { Orange } from '../../utilits/Colors/Colors'
 import Avatar from '@mui/material/Avatar';
 import { StyledBadge } from '../SidePannelTwo/ActiveIndicatorAvatar'
 import About from './About';
+import CommonServersFriends from './CommonServersFriends';
 
 const MainPannelFour = () => {
     return (
@@ -52,6 +53,7 @@ const MainPannelFour = () => {
             </Box>
 
             <About />
+            <CommonServersFriends />
         </Box>
     )
 }

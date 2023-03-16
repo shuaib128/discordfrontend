@@ -12,3 +12,7 @@ input:focus {
     font-size: 14px;
     color: #b9b9b9;
 }
+
+#simple-popover {
+    width: 400px;
+}
