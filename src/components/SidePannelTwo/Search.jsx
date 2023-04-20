@@ -4,8 +4,14 @@ import { Black } from '../../utilits/Colors/Colors'
 
 const Search = () => {
     return (
-        <Box>
-            <input 
+        <Box
+            sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center"
+            }}
+        >
+            <input
                 className='search-input'
                 type="search"
                 placeholder='Find or start a convertation'

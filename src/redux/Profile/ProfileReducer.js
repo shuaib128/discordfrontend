@@ -1,8 +1,9 @@
-import { GET_USER, GET_LOADING } from "./ProfileTypes";
+import { GET_USER, GET_LOADING, GET_SELECTED_USERS } from "./ProfileTypes";
 
 const initialState = {
     Loading: false,
-    User: {}
+    User: {},
+    SelectedUsers: []
 }
 
 const userReducer = (state = initialState, action) => {
@@ -14,6 +15,10 @@ const userReducer = (state = initialState, action) => {
         case GET_USER: return {
             ...state,
             User: action.payload
+        }
+        case GET_SELECTED_USERS: return {
+            ...state,
+            SelectedUsers: action.payload
         }
         default: return state
     }

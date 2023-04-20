@@ -15,11 +15,18 @@ export default function FetchData(URL) {
         };
 
         return fetch(`${BackendLink}${URL}`, requestOptions)
-            .then(response => response.json())
+            .then(response => {
+                if(response.status !== 200){
+                    window.location.replace('/signin');
+                }
+                return response.json()
+            })
             .then(data => {
                 return data;
             })
-            .catch(error => console.log('error', error));
+            .catch(error => {
+                
+            });
     } else {
         return Promise.reject(new Error('Access token is empty'));
     }

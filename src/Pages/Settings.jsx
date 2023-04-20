@@ -37,7 +37,7 @@ export default function Settings() {
             sx={{
                 gridTemplateColumns: "30% 70%",
                 width: "100%",
-                display: "grid",
+                display: ["block", "block", "grid", "grid"],
                 height: "100%",
                 overflow: "hidden"
             }}
@@ -46,12 +46,21 @@ export default function Settings() {
                 sx={{
                     backgroundColor: BlackLight,
                     paddingTop: "30px",
-                    display: "flex",
+                    display: ["none", "none", "flex", "flex"],
                     justifyContent: "end",
-                    paddingRight: "20px"
+                    paddingRight: ["0px", "0px", "20px", "20px"],
+                    position: ["fixed", "fixed", "static", "static"],
+                    height: "100vh",
+                    width: "100%",
+                    top: 0,
+                    zIndex: 3
                 }}
+                className="setting-tab"
             >
-                <Box sx={{ width: "205px" }}>
+                <Box sx={{  
+                    width: ["cacl(100% - 50px)", "cacl(100% - 50px)", "205px", "205px"],
+                    marginX: "25px"
+                }}>
                     <Typography
                         variant="button"
                         display="block"
@@ -71,10 +80,15 @@ export default function Settings() {
             <Box
                 sx={{
                     backgroundColor: "#313338",
-                    padding: "20px 40px",
+                    paddingX: "20px",
+                    paddingY: "40px"
                 }}
             >
-                <Box width="650px">
+                <Box
+                    sx={{
+                        width: ["100%,", "100%", "650px", "650px"]
+                    }}
+                >
                     {Tab}
                 </Box>
             </Box>

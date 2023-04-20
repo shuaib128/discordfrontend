@@ -9,12 +9,23 @@ const SettingsTabs = ({ SelectedTab, setSelectedTab }) => {
         return (
             <Box
                 sx={{
-                    backgroundColor: SelectedTab ===  Name ? BlackLightMore : "inherit",
+                    backgroundColor: SelectedTab === Name ? BlackLightMore : "inherit",
                     padding: "5px 12px",
                     borderRadius: "5px",
                     cursor: "pointer"
                 }}
-                onClick={() => setSelectedTab(Name)}
+                onClick={() => {
+                    setSelectedTab(Name)
+
+                    const selectedUserDOM = document.querySelector(".setting-tab")
+                    var computedStyle = window.getComputedStyle(selectedUserDOM);
+
+                    if (computedStyle.display === "none") {
+                        selectedUserDOM.style.cssText = "display: block"
+                    } else {
+                        selectedUserDOM.style.cssText = "display: none"
+                    }
+                }}
             >
                 <Typography
                     variant="subtitle1"

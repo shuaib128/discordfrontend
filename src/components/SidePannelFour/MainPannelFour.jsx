@@ -4,13 +4,16 @@ import { Orange } from '../../utilits/Colors/Colors'
 import Avatar from '@mui/material/Avatar';
 import { StyledBadge } from '../SidePannelTwo/ActiveIndicatorAvatar'
 import About from './About';
-import CommonServersFriends from './CommonServersFriends';
+import { useSelector } from 'react-redux'
+import { BackendLink } from '../../utilits/BackendLink';
 
 const MainPannelFour = () => {
+    const SelectedUser = useSelector(state => state.SelectedUser.SelectedUser)
+
     return (
         <Box
             sx={{
-                width: "350px",
+                width: ["100%", "350px", "350px", "350px"],
                 height: "100%"
             }}
         >
@@ -42,9 +45,9 @@ const MainPannelFour = () => {
                 >
                     <Avatar
                         alt="Remy Sharp"
-                        src="https://images.pexels.com/photos/15580815/pexels-photo-15580815.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
+                        src={SelectedUser && BackendLink + SelectedUser.profile_picture}
                         sx={{
-                            width: "80px", 
+                            width: "80px",
                             height: "80px",
                             border: `7px solid #232428`
                         }}
@@ -52,8 +55,9 @@ const MainPannelFour = () => {
                 </StyledBadge>
             </Box>
 
-            <About />
-            <CommonServersFriends />
+            <About 
+                SelectedUser={SelectedUser}
+            />
         </Box>
     )
 }

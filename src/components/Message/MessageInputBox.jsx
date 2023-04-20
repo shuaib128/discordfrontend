@@ -1,33 +1,71 @@
-import React, { useState, useRef } from 'react'
+import React, { useRef } from 'react'
 import { Box } from '@mui/system';
 import { BlackLightMore } from '../../utilits/Colors/Colors';
 import UseAutosizeTextArea from "./UseAutosizeTextArea";
+import IconButton from '@mui/material/IconButton';
+import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 
-const MessageInputBox = () => {
-    const [value, setValue] = useState("");
+const MessageInputBox = ({ Message, setMessage, handleSubmit, handleFileChange }) => {
     const textAreaRef = useRef();
 
-    UseAutosizeTextArea(textAreaRef.current, value);
+    UseAutosizeTextArea(textAreaRef.current, Message);
 
     const handleChange = (evt) => {
         const val = evt.target?.value;
-        setValue(val);
+        setMessage(val);
     };
+
+    const handleKeyPress = (evt) => {
+        if (evt.keyCode === 13 || evt.which === 13) {
+            evt.preventDefault();
+            handleSubmit()
+        }
+    }
 
     return (
         <Box
             sx={{
                 position: "absolute",
-                bottom: "53px",
+                bottom: ["53px", "53px", "44px", "44px"],
                 left: "15px",
-                width: "calc(100% - 30px)"
+                width: "calc(100% - 30px)",
+                display: "flex",
+                alignItems: "center"
             }}
         >
+            <IconButton
+                color="primary"
+                aria-label="open menu"
+                sx={{
+                    position: "relative",
+                    cursor: "pointer",
+                    paddingLeft: 0
+                }}
+            >
+                <DriveFolderUploadIcon
+                    style={{ color: "white", width: "30px" }}
+                />
+                <input
+                    style={{
+                        position: "absolute",
+                        left: 0,
+                        width: "100%",
+                        cursor: "pointer",
+                        opacity: 0
+                    }}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileChange}
+                />
+            </IconButton>
             <textarea
+                className='message-input'
                 onChange={handleChange}
+                onKeyDown={handleKeyPress}
                 rows={1}
                 placeholder="Send a message"
-                value={value}
+                value={Message}
                 ref={textAreaRef}
                 style={{
                     width: "calc(100% - 40px)",

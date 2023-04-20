@@ -11,6 +11,8 @@ import MainPannelTwo from './components/SidePannelTwo/Main';
 import MainPannelFour from './components/SidePannelFour/MainPannelFour';
 import { Provider } from 'react-redux';
 import store from './redux/store';
+import MenuIcon from '@mui/icons-material/Menu';
+import IconButton from '@mui/material/IconButton';
 //Pages
 import SignUp from './Pages/SignUp';
 import SignIn from './Pages/SignIn';
@@ -34,7 +36,36 @@ function App() {
               height: "auto"
             }}
           >
-            <Container maxWidth={false} sx={{ paddingY: 0.4 }}>
+            <Container maxWidth={false} sx={{
+              paddingY: 0.4, display: "flex", alignItems: "center"
+            }}>
+              <IconButton
+                color="primary"
+                aria-label="open menu"
+                sx={{
+                  display: ["block", "block", "none", "none"],
+                  position: "relative",
+                  padding: 0.5
+                }}
+                onClick={() => {
+                  const pannelOne = document.querySelector(".pannel-one")
+                  const pannelTwo = document.querySelector(".pannel-two")
+
+                  var pannelOneStyle = window.getComputedStyle(pannelOne);
+
+                  if (pannelOneStyle.display === "none") {
+                    pannelOne.style.cssText = "display: block"
+                    pannelTwo.style.cssText = "display: block"
+                  } else {
+                    pannelOne.style.cssText = "display: none"
+                    pannelTwo.style.cssText = "display: none"
+                  }
+                }}
+              >
+                <MenuIcon
+                  style={{ color: "white", width: "20px" }}
+                />
+              </IconButton>
               <Typography variant="subtitle2" gutterBottom color="white">
                 Discord
               </Typography>
@@ -53,7 +84,15 @@ function App() {
             }}
           >
             {condition ?
-              <Grid item sx={{ backgroundColor: Black, height: "100vh" }}>
+              <Grid
+                item
+                className='pannel-one'
+                sx={{
+                  backgroundColor: Black,
+                  height: "100vh",
+                  display: ["none", "none", "block", "block"]
+                }}
+              >
                 <Container maxWidth={false}>
                   <Main />
                 </Container>
@@ -62,13 +101,25 @@ function App() {
             }
 
             {condition ?
-              <Grid item sx={{ backgroundColor: BlackLight }}>
+              <Grid
+                className='pannel-two'
+                item
+                sx={{
+                  backgroundColor: BlackLight,
+                  display: ["none", "none", "block", "block"],
+                }}
+              >
                 <MainPannelTwo />
               </Grid> :
               <Box />
             }
 
-            <Grid item sx={{ backgroundColor: "#2e3035", height: "100vh" }}>
+            <Grid item
+              sx={{
+                backgroundColor: "#2e3035",
+                height: "100vh"
+              }}
+            >
               <Routes>
                 <Route path="/" element={<Home />} />
               </Routes>
@@ -89,7 +140,20 @@ function App() {
             </Grid>
 
             {condition ?
-              <Grid item sx={{ backgroundColor: "#232428" }}>
+              <Grid
+                className='selected-user'
+                item
+                sx={{
+                  backgroundColor: "#232428",
+                  width: ["100%", "350px", "350px", "auto"],
+                  position: ["fixed", "fixed", "fixed", "static"],
+                  right: "-700px",
+                  height: ["100vh", "100vh", "100vh", "auto"],
+                  transition: "5px",
+                  zIndex: 1,
+                  top: 0,
+                }}
+              >
                 <MainPannelFour />
               </Grid> :
               <Box />

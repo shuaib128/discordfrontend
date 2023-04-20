@@ -1,9 +1,9 @@
 import React from 'react'
 import { Box } from '@mui/system'
 import Typography from '@mui/material/Typography';
-import { Black } from '../../utilits/Colors/Colors';
+import { FormatedDate, Main } from "../../utilits/Date/Main"
 
-const About = () => {
+const About = ({ SelectedUser }) => {
     return (
         <Box sx={{
             backgroundColor: "#111214",
@@ -23,7 +23,7 @@ const About = () => {
                     paddingBottom="5px"
                     borderBottom="1px solid #474444"
                 >
-                    carlitos.206
+                    {SelectedUser && SelectedUser.username}
                 </Typography>
             </Box>
 
@@ -41,7 +41,7 @@ const About = () => {
                     color="white"
                     paddingBottom="5px"
                 >
-                    Jan 07, 2021
+                    {FormatedDate(SelectedUser && SelectedUser.created_at)}
                 </Typography>
             </Box>
 
@@ -59,8 +59,7 @@ const About = () => {
                     color="white"
                     lineHeight="25px"
                 >
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-                    blanditiis tenetur und.
+                    {SelectedUser && SelectedUser.bio}
                 </Typography>
             </Box>
         </Box>

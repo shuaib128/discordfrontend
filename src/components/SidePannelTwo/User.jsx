@@ -53,14 +53,14 @@ const User = () => {
         <Box
             sx={{
                 position: "absolute",
-                bottom: "33px",
+                bottom: ["46px", "46px", "33px", "33px"],
                 display: "flex",
                 alignItems: "center",
-                width: "calc(100% - 20px)",
+                width: "calc(100% - 28px)",
                 justifyContent: "space-between",
                 backgroundColor: "#232428",
                 left: 0,
-                padding: "10px",
+                padding: "14px",
             }}
         >
             <Box
@@ -124,9 +124,6 @@ const User = () => {
                     horizontal: 'left',
                 }}
             >
-                <Box>
-                    <Typography sx={{ p: 2 }}>The content of the Popover.</Typography>
-                </Box>
                 <Button variant="contained" color="error"
                     onClick={() => Logout(
                         "/api/users/user/logout/", 

@@ -1,0 +1,3 @@
+export const SELECT_USER = "SELECT_USER"
+export const SELECT_MESSAGES = "SELECT_MESSAGES"
+export const RESET_MESSAGES = "RESET_MESSAGES"

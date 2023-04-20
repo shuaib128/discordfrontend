@@ -7,8 +7,13 @@ import { StyledBadge } from './ActiveIndicatorAvatar';
 import Avatar from '@mui/material/Avatar';
 import CircularProgress from '@mui/material/CircularProgress';
 import { BackendLink } from '../../utilits/BackendLink';
+import { useSelector, useDispatch } from 'react-redux'
+import { getSelectedUser } from '../../redux/Messages/MessagesActions';
+import { SetSelectedUser } from '../Message/SetSelectedUserLocalhost';
 
-const SearchFriendModal = () => {
+const SearchFriendModal = (props) => {
+    const dispatch = useDispatch();
+    const Profile = useSelector(state => state.Profile.User)
     const [User, setUser] = useState("");
     const [Users, setUsers] = useState([]);
     const [timerId, setTimerId] = useState(null);
@@ -26,7 +31,7 @@ const SearchFriendModal = () => {
         }
 
         const newTimerId = setTimeout(() => SendData(
-            "/api/users/user/search/", User
+            "POST", "/api/users/user/search/", User
         ).then((data) => {
             if (data !== "No user found") {
                 setUsers(data);
@@ -45,7 +50,7 @@ const SearchFriendModal = () => {
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: 400,
+                width: ["calc(100% - 72px)", "400px", "400px", "400px"],
                 bgcolor: '#2e3035',
                 boxShadow: 24,
                 p: 2,
@@ -62,6 +67,7 @@ const SearchFriendModal = () => {
 
             <input
                 className='search-input'
+                autoFocus
                 type="search"
                 placeholder='Find a friend to start talking'
                 onChange={(e) => FetchUser(e.target.value)}
@@ -82,43 +88,63 @@ const SearchFriendModal = () => {
                 {User !== "" ?
                     <Box>
                         {Users.map((user, index) => {
-                            return (
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        marginBottom: "10px",
-                                        cursor: "pointer",
-                                        padding: "8px 16px",
-                                        borderRadius: 1.3,
-                                        transition: ".5s"
-                                    }}
-                                    key={index}
-                                >
-                                    <StyledBadge
-                                        overlap="circular"
-                                        anchorOrigin={{
-                                            vertical: 'bottom',
-                                            horizontal: 'right'
-                                        }}
-                                        variant="dot"
-                                    >
-                                        <Avatar
-                                            alt="Remy Sharp"
-                                            src={BackendLink + user.profile_picture}
-                                        />
-                                    </StyledBadge>
+                            if (user.username !== Profile.username) {
+                                return (
+                                    <div onClick={() => {
+                                        dispatch(getSelectedUser(user))
+                                        props.handleClose()
+                                        SetSelectedUser(user)
 
-                                    <Typography
-                                        variant="subtitle2"
-                                        gutterBottom
-                                        color='white'
-                                        ml='15px'
-                                    >
-                                        {user.username}
-                                    </Typography>
-                                </Box>
-                            )
+                                        const pannelOne = document.querySelector(".pannel-one")
+                                        const pannelTwo = document.querySelector(".pannel-two")
+
+                                        var pannelOneStyle = window.getComputedStyle(pannelOne);
+                                        if (window.innerWidth >= 899 && pannelOneStyle.display !== "none") {
+                                            pannelOne.style.cssText = "display: block"
+                                            pannelTwo.style.cssText = "display: block"
+                                        } else {
+                                            pannelOne.style.cssText = "display: none"
+                                            pannelTwo.style.cssText = "display: none"
+                                        }
+                                    }}>
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                marginBottom: "10px",
+                                                cursor: "pointer",
+                                                padding: "8px 16px",
+                                                borderRadius: 1.3,
+                                                transition: ".5s"
+                                            }}
+                                            key={index}
+                                        >
+                                            <StyledBadge
+                                                overlap="circular"
+                                                anchorOrigin={{
+                                                    vertical: 'bottom',
+                                                    horizontal: 'right'
+                                                }}
+                                                variant="dot"
+                                            >
+                                                <Avatar
+                                                    alt="Remy Sharp"
+                                                    src={BackendLink + user.profile_picture}
+                                                />
+                                            </StyledBadge>
+
+                                            <Typography
+                                                variant="subtitle2"
+                                                gutterBottom
+                                                color='white'
+                                                ml='15px'
+                                            >
+                                                {user.username}
+                                            </Typography>
+                                        </Box>
+                                    </div>
+                                )
+                            }
                         })}
                     </Box> :
                     <Box></Box>

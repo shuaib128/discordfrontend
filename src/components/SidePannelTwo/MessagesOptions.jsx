@@ -1,12 +1,25 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Box } from '@mui/system'
 import { Typography } from '@mui/material'
 import { PlaceHostColor } from '../../utilits/Colors/Colors'
 import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button';
 import MessagesOption from './MessagesOption';
+import { useSelector, useDispatch } from 'react-redux';
+import { BackendLink } from '../../utilits/BackendLink';
+import { getSelectedUser } from '../../redux/Messages/MessagesActions';
+import { SetSelectedUser } from '../Message/SetSelectedUserLocalhost';
+import { getSelectedUsers } from '../../redux/Profile/ProfileActions';
 
 const MessagesOptions = (props) => {
+    const dispatch = useDispatch();
+    const User = useSelector(state => state.Profile.User)
+    const SelectedUsers = useSelector(state => state.Profile.SelectedUsers)
+
+    useEffect(() => {
+        dispatch(getSelectedUsers(User.chat_friend))
+    }, [User])
+
     return (
         <Box sx={{ marginTop: "14px" }}>
             <Box sx={{
@@ -33,18 +46,34 @@ const MessagesOptions = (props) => {
             </Box>
 
             <Box>
-                <MessagesOption 
-                    Name="trrausts117"
-                    Image="https://images.pexels.com/photos/15580815/pexels-photo-15580815.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
-                />
-                <MessagesOption 
-                    Name="carlos.226"
-                    Image="https://images.pexels.com/photos/15460077/pexels-photo-15460077.jpeg?auto=compress&cs=tinysrgb&w=150&lazy=load 150w, https://images.pexels.com/photos/15460077/pexels-photo-15460077.jpeg?auto=compress&cs=tinysrgb&w=300&lazy=load 300w, https://images.pexels.com/photos/15460077/pexels-photo-15460077.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load 400w, https://images.pexels.com/photos/15460077/pexels-photo-15460077.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load 600w, https://images.pexels.com/photos/15460077/pexels-photo-15460077.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load 800w, https://images.pexels.com/photos/15460077/pexels-photo-15460077.jpeg?auto=compress&cs=tinysrgb&w=1200&lazy=load 1200w, https://images.pexels.com/photos/15460077/pexels-photo-15460077.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load 1600w"
-                />
-                <MessagesOption 
-                    Name="saltyneat"
-                    Image="https://images.pexels.com/photos/11442244/pexels-photo-11442244.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
-                />
+                {SelectedUsers && SelectedUsers.map((option, index) => {
+                    return (
+                        <Box
+                            key={index}
+                            onClick={() => {
+                                dispatch(getSelectedUser(option))
+                                SetSelectedUser(option)
+
+                                const pannelOne = document.querySelector(".pannel-one")
+                                const pannelTwo = document.querySelector(".pannel-two")
+
+                                var pannelOneStyle = window.getComputedStyle(pannelOne);
+                                if (window.innerWidth >= 899 && pannelOneStyle.display !== "none") {
+                                    pannelOne.style.cssText = "display: block"
+                                    pannelTwo.style.cssText = "display: block"
+                                } else {
+                                    pannelOne.style.cssText = "display: none"
+                                    pannelTwo.style.cssText = "display: none"
+                                }
+                            }}
+                        >
+                            <MessagesOption
+                                Name={option.username}
+                                Image={BackendLink + option.profile_picture}
+                            />
+                        </Box>
+                    )
+                })}
             </Box>
         </Box>
     )

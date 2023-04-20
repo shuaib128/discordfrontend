@@ -101,12 +101,12 @@ const SignUp = () => {
                     backgroundColor: "#313338",
                     padding: "40px 30px",
                     borderRadius: "6px",
-                    display: "flex"
+                    display: ["block", "flex", "flex", "flex"]
                 }}
             >
                 <Box
                     sx={{
-                        width: "60%"
+                        width: ["100%", "60%", "60%", "60%"]
                     }}
                 >
                     <Typography
@@ -210,7 +210,11 @@ const SignUp = () => {
                     </Typography>
                 </Box>
 
-                <Box>
+                <Box
+                    sx={{
+                        width: ["100%", "60%", "60%", "60%"]
+                    }}
+                >
 
                 </Box>
             </Container >

@@ -13,10 +13,12 @@ const MainPannelTwo = () => {
 
     return (
         <Box sx={{
-            width: "250px",
+            width: ["calc(100% - 111px)", "calc(100% - 111px)", "250px", "250px"],
+            position: ["fixed", "fixed", "relative", "relative"],
             paddingX: "13px",
             height: "100vh",
-            position: "relative"
+            zIndex: 4,
+            backgroundColor: "#2b2d31"
         }}>
             <Search />
             <MessagesOptions 
@@ -28,7 +30,9 @@ const MainPannelTwo = () => {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <SearchFriendModal />
+                <SearchFriendModal 
+                    handleClose={handleClose}
+                />
             </Modal>
             <User />
         </Box>
