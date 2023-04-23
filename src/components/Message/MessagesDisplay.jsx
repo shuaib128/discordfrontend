@@ -90,6 +90,7 @@ const MessagesDisplay = ({ Messages }) => {
                                 fontWeight={550}
                                 color="#dcdcdc"
                                 variant="body1"
+                                style={{ whiteSpace: 'pre-wrap' }}
                                 gutterBottom
                             >
                                 {message.content}
