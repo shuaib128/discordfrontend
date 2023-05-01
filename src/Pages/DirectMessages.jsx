@@ -8,7 +8,7 @@ const DirectMessages = () => {
 
     useEffect(() => {
         const newSocket = new WebSocket(
-            `ws://127.0.0.1:8000/ws/chat/useroneshuiab/usertwosam/`
+            `wss://127.0.0.1:8000/ws/chat/useroneshuiab/usertwosam/`
         );
         setSocket(newSocket);
         return () => newSocket.close();

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box } from '@mui/system'
 import Typography from '@mui/material/Typography';
-import { FormatedDate, Main } from "../../utilits/Date/Main"
+import { FormatedDate } from "../../utilits/Date/Main"
 
 const About = ({ SelectedUser }) => {
     return (

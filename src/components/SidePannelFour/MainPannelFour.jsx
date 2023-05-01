@@ -25,39 +25,45 @@ const MainPannelFour = () => {
                 }}
             />
 
-            <Box
-                sx={{
-                    position: "relative",
-                    top: "-40px",
-                    left: "20px"
-                }}
-            >
-                <StyledBadge
-                    overlap="circular"
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right'
-                    }}
-                    variant="dot"
+            {SelectedUser ?
+                <Box
                     sx={{
-                        cursor: "pointer"
+                        position: "relative",
+                        top: "-40px",
+                        left: "20px"
                     }}
                 >
-                    <Avatar
-                        alt="Remy Sharp"
-                        src={SelectedUser && BackendLink + SelectedUser.profile_picture}
-                        sx={{
-                            width: "80px",
-                            height: "80px",
-                            border: `7px solid #232428`
+                    <StyledBadge
+                        overlap="circular"
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right'
                         }}
-                    />
-                </StyledBadge>
-            </Box>
+                        variant="dot"
+                        sx={{
+                            cursor: "pointer"
+                        }}
+                    >
+                        <Avatar
+                            alt="Remy Sharp"
+                            src={SelectedUser && BackendLink + SelectedUser.profile_picture}
+                            sx={{
+                                width: "80px",
+                                height: "80px",
+                                border: `7px solid #232428`
+                            }}
+                        />
+                    </StyledBadge>
+                </Box> :
+                <Box></Box>
+            }
 
-            <About 
-                SelectedUser={SelectedUser}
-            />
+            {SelectedUser ?
+                <About
+                    SelectedUser={SelectedUser}
+                /> :
+                <Box></Box>
+            }
         </Box>
     )
 }

@@ -2,7 +2,12 @@ import React from 'react'
 import { Box } from '@mui/system'
 import { Black } from '../../utilits/Colors/Colors'
 
-const Search = () => {
+const Search = ({ SearchValue, setSearchValue, setLoading }) => {
+    function FetchConvertation(text) {
+        setSearchValue(text)
+        setLoading(true)
+    }
+
     return (
         <Box
             sx={{
@@ -15,6 +20,8 @@ const Search = () => {
                 className='search-input'
                 type="search"
                 placeholder='Find or start a convertation'
+                value={SearchValue}
+                onChange={(e) => FetchConvertation(e.target.value)}
                 style={{
                     border: 0,
                     backgroundColor: Black,

@@ -1,17 +1,35 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box } from '@mui/system';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import { BackendLink } from '../../utilits/BackendLink';
 import { FormatedDateTime } from "../../utilits/Date/Main";
+import Modal from '@mui/material/Modal';
 
 const MessagesDisplay = ({ Messages }) => {
     const scrollableContainer = useRef(null);
+    const [ImageModalOpen, setImageModalOpen] = useState(false)
+    const [PreviewImage, setPreviewImage] = useState("")
+
+    const handleOpen = (imageURL) => {
+        setPreviewImage(imageURL)
+        setImageModalOpen(true)
+    };
+    const handleClose = () => setImageModalOpen(false);
 
     useEffect(() => {
-        // Scroll to the bottom of the container when Messages change or when the component first mounts
+        /**Scroll to the bottom of the container when Messages change or when the component first mounts */
         scrollableContainer.current.scrollTop = scrollableContainer.current.scrollHeight;
     }, [Messages]);
+
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: ["85%", "85%", 450, 450],
+        bgcolor: 'background.paper',
+      };
 
     return (
         <Box
@@ -22,6 +40,17 @@ const MessagesDisplay = ({ Messages }) => {
                 overflowY: "scroll"
             }}
         >
+            <Modal
+                open={ImageModalOpen}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <img src={PreviewImage} alt="prev-img" />
+                </Box>
+            </Modal>
+
             {Messages && Messages.map((message, index) => {
                 return (
                     <Box
@@ -29,13 +58,15 @@ const MessagesDisplay = ({ Messages }) => {
                         sx={{
                             marginTop: "20px",
                             display: "flex",
+                            transition: "0.3s"
                         }}
+                        id={message.id}
                     >
-                        <Avatar
+                        `<Avatar
                             alt="Remy Sharp"
                             src={BackendLink + message.sender.profile_picture}
                             sx={{ width: 45, height: 45 }}
-                        />
+                        />`
 
                         <Box sx={{ marginLeft: "15px" }}>
                             <Box>
@@ -70,17 +101,23 @@ const MessagesDisplay = ({ Messages }) => {
                                         width: ["100%", "350px", "350px", "350px"]
                                     }}
                                 >
-                                    {message.images.map((image, index) => {
+                                    {message.images.map((image, _) => {
                                         return (
-                                            <img
-                                                style={{
-                                                    marginBottom: "7px",
-                                                    borderRadius: "5px",
-                                                    cursor: "pointer"
+                                            <Box
+                                                onClick={() => {
+                                                    handleOpen(BackendLink + image.image)
                                                 }}
-                                                key={index}
-                                                src={BackendLink + image.image}
-                                            />
+                                            >
+                                                <img
+                                                    style={{
+                                                        marginBottom: "7px",
+                                                        borderRadius: "5px",
+                                                        cursor: "pointer"
+                                                    }}
+                                                    key={image.id}
+                                                    src={BackendLink + image.image}
+                                                />
+                                            </Box>
                                         )
                                     })}
                                 </Box> :
@@ -90,6 +127,7 @@ const MessagesDisplay = ({ Messages }) => {
                                 fontWeight={550}
                                 color="#dcdcdc"
                                 variant="body1"
+                                style={{ whiteSpace: 'pre-wrap' }}
                                 gutterBottom
                             >
                                 {message.content}

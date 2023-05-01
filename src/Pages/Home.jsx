@@ -15,9 +15,19 @@ import ChatMessages from '../components/SkalitonLoader/ChatMessages';
 import { resizeImageFile } from '../utilits/Compression/imageCompress';
 import { getUser } from '../redux/Profile/ProfileActions';
 import ImagePreview from '../components/Message/ImagePreview';
+import Connected from '../components/ConnectionStatus/Connected';
+import Connecting from '../components/ConnectionStatus/Connecting';
+import Disconnected from '../components/ConnectionStatus/Disconnected';
+import ImageSendingLoading from '../components/Message/ImageSendingLoading';
 
 function Home() {
     const [socket, setSocket] = useState(null);
+    const [unsentMessages, setUnsentMessages] = useState([]);
+    /**-----------Connecting sates--------------------- */
+    const [ConnectingStatus, setConnectingStatus] = useState(false)
+    const [ConnectedStatus, setConnectedStatus] = useState(false)
+    const [DisconnectedStatus, setDisconnectedStatus] = useState(false)
+    /**---------------------------------------------------*/
     const dispatch = useDispatch();
     const User = useSelector(state => state.Profile.User)
     const SelectedUser = useSelector(state => state.SelectedUser.SelectedUser)
@@ -26,6 +36,7 @@ function Home() {
     const [Message, setMessage] = useState("")
     const [Loading, setLoading] = useState(false)
     const [File, setFile] = useState([]);
+    const [SendingFile, setSendingFile] = useState(false)
 
     //Chech who you were talking to from localhost
     React.useEffect(() => {
@@ -67,16 +78,75 @@ function Home() {
 
     //Connect to the websocket
     React.useEffect(() => {
-        const url_end = GetChatroom(User, SelectedUser)
-        const newSocket = new WebSocket(
-            `ws://${BackendLinkChat}/ws/chat/${url_end}/?token=${GetToken().accessToken}`
-        );
-        setSocket(newSocket);
-        return () => newSocket.close();
-    }, [User, SelectedUser])
+        if (SelectedUser !== null) {
+            try {
+                // Get the chatroom URL endpoint based on the current user and selected user
+                const url_end = GetChatroom(User, SelectedUser);
+
+                // Create a new WebSocket connection to the chatroom using the URL endpoint and access token
+                const newSocket = new WebSocket(`ws://${BackendLinkChat}/ws/chat/${url_end}/?token=${GetToken().accessToken}`);
+
+                // Set the new socket as the state for the component
+                setSocket(newSocket);
+
+                // Define a function to handle the WebSocket connection being opened
+                const handleOpen = () => {
+                    setConnectedStatus(true);
+                    setConnectingStatus(false);
+                    setDisconnectedStatus(false);
+                };
+
+                // Define a function to handle the WebSocket connection being closed
+                const handleClose = () => {
+                    setDisconnectedStatus(true);
+                    setConnectedStatus(false);
+                    setConnectingStatus(true);
+                };
+
+                // Define a function to handle errors with the WebSocket connection
+                const handleError = () => {
+                    setDisconnectedStatus(true);
+                    setConnectedStatus(false);
+                    setConnectingStatus(true);
+                };
+
+                // Check the ready state of the new socket and update the component's connection status accordingly
+                if (newSocket.readyState === WebSocket.CONNECTING) {
+                    setConnectingStatus(true);
+                    setDisconnectedStatus(false);
+                    newSocket.addEventListener("error", handleError);
+                } else if (newSocket.readyState === WebSocket.OPEN) {
+                    setConnectedStatus(true);
+                    setConnectingStatus(false);
+                    setDisconnectedStatus(false);
+                } else if (newSocket.readyState === WebSocket.CLOSED) {
+                    handleClose();
+                }
+
+                // Add event listeners for the WebSocket connection being opened, closed, and encountering an error
+                newSocket.addEventListener("open", handleOpen);
+                newSocket.addEventListener("close", handleClose);
+                newSocket.addEventListener("error", handleError);
+
+                // Clean up the event listeners and close the WebSocket connection when the component is unmounted
+                return () => {
+                    newSocket.removeEventListener("open", handleOpen);
+                    newSocket.removeEventListener("close", handleClose);
+                    newSocket.removeEventListener("error", handleError);
+                    newSocket.close();
+                };
+            } catch (error) {
+
+            }
+        }
+    }, [User, SelectedUser]);
+
 
     //Send the message onclick
     const handleSubmit = () => {
+        if(File.length !== 0) {
+            setSendingFile(true)
+        }
         /**
          * Add al data to data variable
          */
@@ -89,38 +159,92 @@ function Home() {
             data[`img${file}`] = File[file]
         }
 
-        /**
+        setMessage("")
+        if (socket.readyState === WebSocket.OPEN) {
+            /**
          * Send it to backend &
          * setMessage and setFile empty
          */
-        socket.send(JSON.stringify(data));
-        setMessage("")
-        setFile([])
+            socket.send(JSON.stringify(data));
 
-        /**
-         * Send data to friend list
-         */
-        function sendToFriendList() {
-            SendData(
-                "POST",
-                "/api/users/user/friends/add/",
-                {
-                    selectedUser: SelectedUser,
-                }
-            ).then((data) => {
-                dispatch(getUser(data))
-            })
-        }
-        if (SelectedUsers && SelectedUsers.length === 0) {
-            sendToFriendList()
-        } else {
-            const foundObject = SelectedUsers.find(obj => obj.username === SelectedUser.username);
+            /**Get responce that data has been sent */
+            socket.addEventListener('message', (event) => {
+                setSendingFile(false)
+            });
+            setFile([])
 
-            if (!foundObject) {
-                sendToFriendList()
+            /**
+             * Send data to friend list
+             */
+            function sendToFriendList() {
+                SendData(
+                    "POST",
+                    "/api/users/user/friends/add/",
+                    {
+                        selectedUser: SelectedUser,
+                    }
+                ).then((data) => {
+                    dispatch(getUser(data))
+                })
             }
+            if (SelectedUsers && SelectedUsers.length === 0) {
+                sendToFriendList()
+            } else {
+                const foundObject = SelectedUsers.find(
+                    obj => obj.username === SelectedUser.username
+                );
+
+                if (!foundObject) {
+                    sendToFriendList()
+                }
+            }
+        } else {
+            dispatch(getMessages([...Messages, data]))
+            // Add message to unsent messages array
+            setUnsentMessages([...unsentMessages, data]);
         }
     };
+
+
+    /**Try to reconnect and send all the unsent messages */
+    React.useEffect(() => {
+        const url_end = GetChatroom(User, SelectedUser);
+        const intervalId = setInterval(() => {
+            if (SelectedUser !== null && socket.readyState === WebSocket.CLOSED) {
+                try {
+                    const newSocket = new WebSocket(`ws://${BackendLinkChat}/ws/chat/${url_end}/?token=${GetToken().accessToken}`);
+                    setSocket(newSocket);
+
+                    newSocket.addEventListener("open", () => {
+                        setConnectedStatus(true);
+                        setConnectingStatus(false);
+                        setDisconnectedStatus(false);
+
+                        // Send all unsent messages
+                        unsentMessages.forEach(message => newSocket.send(JSON.stringify(message)));
+                        setUnsentMessages([]);
+                    });
+
+                    newSocket.addEventListener("close", () => {
+                        setDisconnectedStatus(true);
+                        setConnectedStatus(false);
+                        setConnectingStatus(true);
+                    });
+
+                    newSocket.addEventListener("error", () => {
+                        setDisconnectedStatus(true);
+                        setConnectedStatus(false);
+                        setConnectingStatus(true);
+                    });
+                } catch (error) {
+
+                }
+            }
+        }, 5000);
+
+        return () => clearInterval(intervalId);
+    }, [socket, unsentMessages]);
+
 
     //Recives the text
     React.useEffect(() => {
@@ -139,13 +263,14 @@ function Home() {
         }
     }, [socket, User, SelectedUser])
 
+
     //Handle file change
     const handleFileChange = async (e) => {
         const files = e.target.files;
         const newFiles = [];
 
         for (let i = 0; i < files.length; i++) {
-            const resizedFile = await resizeImageFile(files[i], 440, 280);
+            const resizedFile = await resizeImageFile(files[i], 840, 680);
 
             const fileReader = new FileReader();
             fileReader.readAsDataURL(resizedFile);
@@ -160,6 +285,7 @@ function Home() {
             });
         }
     };
+
 
     /**
      * Remove Image Item
@@ -182,12 +308,18 @@ function Home() {
                     <MessageTop
                         SelectedUser={SelectedUser}
                     />
+
+                    {ConnectedStatus && <Connected />}
+                    {ConnectingStatus && <Connecting />}
+                    {DisconnectedStatus && <Disconnected />}
+
                     {!Loading ?
                         <MessagesDisplay
                             Messages={Messages}
                         /> :
                         <ChatMessages />
                     }
+
                     {File.length !== 0 ?
                         <ImagePreview
                             File={File}
@@ -195,6 +327,8 @@ function Home() {
                         /> :
                         <Box></Box>
                     }
+
+                    {SendingFile && <ImageSendingLoading />}
                     <MessageInputBox
                         Message={Message}
                         setMessage={setMessage}

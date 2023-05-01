@@ -46,3 +46,17 @@ input:focus {
 ::-webkit-scrollbar-thumb:hover {
     background-color: #99aab5;
 }
+
+.connection-status {
+    transition: opacity 0.5s ease-in-out;
+}
+
+.connection-status.hidden {
+    opacity: 0;
+}
+
+.found-message {
+    background-color: #3f3f3f;
+    padding: 10px;
+    border-radius: 5px;
+}
