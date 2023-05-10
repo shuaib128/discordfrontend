@@ -5,6 +5,8 @@ import Typography from '@mui/material/Typography';
 import { BackendLink } from '../../utilits/BackendLink';
 import { FormatedDateTime } from "../../utilits/Date/Main";
 import Modal from '@mui/material/Modal';
+import DisplayImages from './Image/DisplayImages';
+import VideoDisplay from './Video/VideoDisplay';
 
 const MessagesDisplay = ({ Messages }) => {
     const scrollableContainer = useRef(null);
@@ -29,7 +31,7 @@ const MessagesDisplay = ({ Messages }) => {
         transform: 'translate(-50%, -50%)',
         width: ["85%", "85%", 450, 450],
         bgcolor: 'background.paper',
-      };
+    };
 
     return (
         <Box
@@ -95,34 +97,15 @@ const MessagesDisplay = ({ Messages }) => {
                                 </Typography>
                             </Box>
 
-                            {message.images.length !== 0 ?
-                                <Box
-                                    sx={{
-                                        width: ["100%", "350px", "350px", "350px"]
-                                    }}
-                                >
-                                    {message.images.map((image, _) => {
-                                        return (
-                                            <Box
-                                                onClick={() => {
-                                                    handleOpen(BackendLink + image.image)
-                                                }}
-                                            >
-                                                <img
-                                                    style={{
-                                                        marginBottom: "7px",
-                                                        borderRadius: "5px",
-                                                        cursor: "pointer"
-                                                    }}
-                                                    key={image.id}
-                                                    src={BackendLink + image.image}
-                                                />
-                                            </Box>
-                                        )
-                                    })}
-                                </Box> :
-                                <Box></Box>
-                            }
+                            <DisplayImages
+                                message={message}
+                                handleOpen={handleOpen}
+                            />
+
+                            <VideoDisplay
+                                message={message}
+                            />
+
                             <Typography
                                 fontWeight={550}
                                 color="#dcdcdc"

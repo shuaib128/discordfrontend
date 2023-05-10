@@ -50,9 +50,7 @@ const MessagesFound = ({ messages, SearchValue }) => {
                         const lastTen = sentence.substr(endIndex, numofletter);
 
                         message_ = `${firstTen}${SearchValue}${lastTen}`;
-                    } else {
-                        console.log(`"${word}" not found in the sentence`);
-                    }
+                    } else {}
                 } else {
                     message_ = sentence
                 }

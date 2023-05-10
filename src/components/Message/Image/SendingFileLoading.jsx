@@ -2,7 +2,7 @@ import React from 'react'
 import { Box } from '@mui/system';
 import LinearProgress from '@mui/material/LinearProgress';
 
-const ImageSendingLoading = () => {
+const SendingFileLoading = () => {
     return (
         <Box
             sx={{
@@ -17,4 +17,4 @@ const ImageSendingLoading = () => {
     )
 }
 
-export default ImageSendingLoading
+export default SendingFileLoading

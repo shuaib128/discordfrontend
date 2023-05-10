@@ -4,10 +4,23 @@ import { BlackLightMore } from '../../utilits/Colors/Colors';
 import UseAutosizeTextArea from "./UseAutosizeTextArea";
 import IconButton from '@mui/material/IconButton';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
+import ImageIcon from '@mui/icons-material/Image';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
+import Popover from '@mui/material/Popover';
 
-const MessageInputBox = ({ Message, setMessage, handleSubmit, handleFileChange }) => {
+const MessageInputBox = ({ Message, setMessage, handleSubmit, handleFileChange, handleVideoInputChange }) => {
+    const [anchorEl, setAnchorEl] = React.useState(null);
+
+    const OpenFileOptions = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const open = Boolean(anchorEl);
+
     const textAreaRef = useRef();
-
     UseAutosizeTextArea(textAreaRef.current, Message);
 
     const handleChange = (evt) => {
@@ -41,24 +54,83 @@ const MessageInputBox = ({ Message, setMessage, handleSubmit, handleFileChange }
                     cursor: "pointer",
                     paddingLeft: 0
                 }}
+                onClick={OpenFileOptions}
             >
                 <DriveFolderUploadIcon
                     style={{ color: "white", width: "30px" }}
                 />
-                <input
-                    style={{
-                        position: "absolute",
-                        left: 0,
-                        width: "100%",
-                        cursor: "pointer",
-                        opacity: 0
-                    }}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileChange}
-                />
             </IconButton>
+
+            <Popover
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                }}
+                transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+            >
+                <Box sx={{ padding: "5px 15px" }}>
+                    <IconButton
+                        color="primary"
+                        aria-label="open menu"
+                        sx={{
+                            position: "relative",
+                            cursor: "pointer",
+                            paddingLeft: 0
+                        }}
+                    >
+                        <ImageIcon
+                            style={{ color: "black", width: "30px" }}
+                        />
+                        <input
+                            style={{
+                                position: "absolute",
+                                left: 0,
+                                width: "100%",
+                                cursor: "pointer",
+                                opacity: 0
+                            }}
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleFileChange}
+                        />
+                    </IconButton>
+
+                    <IconButton
+                        color="primary"
+                        aria-label="open menu"
+                        sx={{
+                            position: "relative",
+                            cursor: "pointer",
+                            paddingLeft: 0
+                        }}
+                    >
+                        <VideoLibraryIcon
+                            style={{ color: "black", width: "30px" }}
+                        />
+                        <input
+                            style={{
+                                position: "absolute",
+                                left: 0,
+                                width: "100%",
+                                cursor: "pointer",
+                                opacity: 0
+                            }}
+                            type="file"
+                            accept="video/*"
+                            multiple
+                            onChange={handleVideoInputChange}
+                        />
+                    </IconButton>
+                </Box>
+            </Popover>
+
             <textarea
                 className='message-input'
                 onChange={handleChange}
