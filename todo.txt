@@ -1,0 +1,5 @@
+1. Sending video
+    a. Improvode video sending
+    b. Add unenrapted uploading
+    
+2. Make a chaching system for old chats

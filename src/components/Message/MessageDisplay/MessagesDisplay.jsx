@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box } from '@mui/system';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
-import { BackendLink } from '../../utilits/BackendLink';
-import { FormatedDateTime } from "../../utilits/Date/Main";
+import { BackendLink } from '../../../utilits/BackendLink';
+import { FormatedDateTime } from "../../../utilits/Date/Main";
 import Modal from '@mui/material/Modal';
-import DisplayImages from './Image/DisplayImages';
-import VideoDisplay from './Video/VideoDisplay';
+import DisplayImages from '../Image/DisplayImages';
+import VideoDisplay from '../Video/VideoDisplay';
 
 const MessagesDisplay = ({ Messages }) => {
     const scrollableContainer = useRef(null);
@@ -24,6 +24,19 @@ const MessagesDisplay = ({ Messages }) => {
         scrollableContainer.current.scrollTop = scrollableContainer.current.scrollHeight;
     }, [Messages]);
 
+    /**Infinity scroll handler */
+    const handleScroll = (e) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+
+        if (scrollTop === 0) {
+            console.log("Reached the top of the scroll!");
+        }
+
+        if (scrollHeight - scrollTop === clientHeight) {
+            console.log("Reached the bottom of the scroll!");
+        }
+    };
+
     const style = {
         position: 'absolute',
         top: '50%',
@@ -36,6 +49,7 @@ const MessagesDisplay = ({ Messages }) => {
     return (
         <Box
             ref={scrollableContainer}
+            onScroll={handleScroll}
             sx={{
                 padding: "0px 17px",
                 height: "calc(100vh - 175px)",

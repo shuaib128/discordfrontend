@@ -10,7 +10,7 @@ const userReducer = (state = initialState, action) => {
     switch (action.type) {
         case GET_LOADING: return {
             ...state,
-            Loading: !initialState.LoadingLoading
+            Loading: !initialState.Loading
         }
         case GET_USER: return {
             ...state,

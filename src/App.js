@@ -17,7 +17,6 @@ import IconButton from '@mui/material/IconButton';
 import SignUp from './Pages/SignUp';
 import SignIn from './Pages/SignIn';
 import Home from './Pages/Home';
-import DirectMessages from './Pages/DirectMessages';
 import Settings from './Pages/Settings';
 
 function App() {
@@ -123,11 +122,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
               </Routes>
-
-              <Routes>
-                <Route path="/messages/direct-messages" element={<DirectMessages />} />
-              </Routes>
-
+              
               <Routes>
                 <Route path="/signup" element={<SignUp />} />
               </Routes>

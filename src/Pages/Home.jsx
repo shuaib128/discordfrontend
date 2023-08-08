@@ -1,12 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Box } from '@mui/system';
-import MessageInputBox from '../components/Message/MessageInputBox'
+import MessageInputBox from '../components/Message/MessageDisplay/MessageInputBox'
 import MessageTop from '../components/Message/MessageTop';
 import { useSelector, useDispatch } from 'react-redux';
-import { getSelectedUser } from '../redux/Messages/MessagesActions';
 import SendData from '../utilits/Data/SendData';
 import GetChatroom from '../components/Message/GetChatroom';
-import MessagesDisplay from '../components/Message/MessagesDisplay';
+import MessagesDisplay from '../components/Message/MessageDisplay/MessagesDisplay';
 import { getMessages } from '../redux/Messages/MessagesActions';
 import { resetMessages } from '../redux/Messages/MessagesActions';
 import { GetToken } from '../utilits/Token/GetToken';
@@ -14,15 +13,20 @@ import { BackendLinkChat } from '../utilits/BackendLink';
 import ChatMessages from '../components/SkalitonLoader/ChatMessages';
 import { resizeImageFile } from '../utilits/Compression/imageCompress';
 import { getUser } from '../redux/Profile/ProfileActions';
-import ImagePreview from '../components/Message/ImagePreview';
+import ImagePreview from '../components/Message/MessageDisplay/ImagePreview';
 import Connected from '../components/ConnectionStatus/Connected';
 import Connecting from '../components/ConnectionStatus/Connecting';
 import Disconnected from '../components/ConnectionStatus/Disconnected';
 import SendingFileLoading from '../components/Message/Image/SendingFileLoading';
 import VideoSendingProgress from '../components/Message/Video/VideoSendingProgress';
 import { sendVideoChunks } from '../components/Message/Video/sendVideoChunks';
+import { useGetLatestChatUser } from '../components/Message/GetLatestChatUser';
+import { useGetPreviousChats } from '../components/Message/GetPreviousChats';
 
 function Home() {
+    const { getLatestChatUser } = useGetLatestChatUser();
+    const { getPreviousChats } = useGetPreviousChats();
+
     const [socket, setSocket] = useState(null);
     const [unsentMessages, setUnsentMessages] = useState([]);
     /**-----------Connecting sates--------------------- */
@@ -45,52 +49,28 @@ function Home() {
     const [VideoFileName, setVideoFileName] = useState("")
 
     //Chech who you were talking to from localhost
-    React.useEffect(() => {
-        try {
-            dispatch(getSelectedUser(
-                JSON.parse(localStorage.getItem("SelectedUser"))
-            ))
-        } catch (error) {
-
-        }
+    useEffect(() => {
+        getLatestChatUser()
     }, [])
 
     //Get chats from the chat room
-    React.useEffect(() => {
-        try {
-            setLoading(true)
-            const chatRoom = GetChatroom(User, SelectedUser)
-            SendData(
-                "POST",
-                "/api/chat/chatroom/",
-                {
-                    chatRoom: chatRoom,
-                    user: User.username,
-                    selectedUser: SelectedUser.username
-                }
-            ).then((data) => {
-                /**
-                 * Delete all the messages from the redux messages and
-                 * add message from history
-                 */
-                dispatch(resetMessages())
-                dispatch(getMessages(data.chatContext))
-                setLoading(false)
-            })
-        } catch (error) {
-
-        }
+    useEffect(() => {
+        getPreviousChats(
+            setLoading,
+            User,
+            SelectedUser
+        )
     }, [User, SelectedUser])
 
     //Connect to the websocket
-    React.useEffect(() => {
+    useEffect(() => {
         if (SelectedUser !== null) {
             try {
                 // Get the chatroom URL endpoint based on the current user and selected user
                 const url_end = GetChatroom(User, SelectedUser);
 
                 // Create a new WebSocket connection to the chatroom using the URL endpoint and access token
-                const newSocket = new WebSocket(`ws://${BackendLinkChat}/ws/chat/${url_end}/?token=${GetToken().accessToken}`);
+                const newSocket = new WebSocket(`${BackendLinkChat}/ws/chat/${url_end}/?token=${GetToken().accessToken}`);
 
                 // Set the new socket as the state for the component
                 setSocket(newSocket);
@@ -227,7 +207,9 @@ function Home() {
         const intervalId = setInterval(() => {
             if (SelectedUser !== null && socket.readyState === WebSocket.CLOSED) {
                 try {
-                    const newSocket = new WebSocket(`ws://${BackendLinkChat}/ws/chat/${url_end}/?token=${GetToken().accessToken}`);
+                    const newSocket = new WebSocket(
+                        `wss://${BackendLinkChat}/ws/chat/${url_end}/?token=${GetToken().accessToken}`
+                    );
                     setSocket(newSocket);
 
                     newSocket.addEventListener("open", () => {
@@ -262,7 +244,7 @@ function Home() {
 
 
     //Recives the text
-    React.useEffect(() => {
+    useEffect(() => {
         /** 
          * Get data back and save to getMessages
          */
@@ -353,7 +335,6 @@ function Home() {
         socket.send(JSON.stringify({ type: "allvideocame", }));
         setSendingVideoFile(false)
     }
-
 
     /**
      * Remove Image Item when clicked delete button
