@@ -5,8 +5,7 @@ import Typography from '@mui/material/Typography';
 import { BackendLink } from '../../../utilits/BackendLink';
 import { FormatedDateTime } from "../../../utilits/Date/Main";
 import Modal from '@mui/material/Modal';
-import DisplayImages from '../Image/DisplayImages';
-import VideoDisplay from '../Video/VideoDisplay';
+import DisplayMedia from '../Image/DisplayMedia';
 
 const MessagesDisplay = ({ Messages }) => {
     const scrollableContainer = useRef(null);
@@ -28,13 +27,9 @@ const MessagesDisplay = ({ Messages }) => {
     const handleScroll = (e) => {
         const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
 
-        if (scrollTop === 0) {
-            console.log("Reached the top of the scroll!");
-        }
+        if (scrollTop === 0) { }
 
-        if (scrollHeight - scrollTop === clientHeight) {
-            console.log("Reached the bottom of the scroll!");
-        }
+        if (scrollHeight - scrollTop === clientHeight) { }
     };
 
     const style = {
@@ -51,7 +46,7 @@ const MessagesDisplay = ({ Messages }) => {
             ref={scrollableContainer}
             onScroll={handleScroll}
             sx={{
-                padding: "0px 17px",
+                padding: ["0px 10px", "0px 10px", "0px 17px", "0px 17px"],
                 height: "calc(100vh - 175px)",
                 overflowY: "scroll"
             }}
@@ -67,7 +62,7 @@ const MessagesDisplay = ({ Messages }) => {
                 </Box>
             </Modal>
 
-            {Messages && Messages.map((message, index) => {
+            {Messages && Object.values(Messages).map((message, index) => {
                 return (
                     <Box
                         key={index}
@@ -81,7 +76,10 @@ const MessagesDisplay = ({ Messages }) => {
                         `<Avatar
                             alt="Remy Sharp"
                             src={BackendLink + message.sender.profile_picture}
-                            sx={{ width: 45, height: 45 }}
+                            sx={{
+                                width: [35, 45, 45, 45],
+                                height: [35, 45, 45, 45]
+                            }}
                         />`
 
                         <Box sx={{ marginLeft: "15px" }}>
@@ -111,13 +109,9 @@ const MessagesDisplay = ({ Messages }) => {
                                 </Typography>
                             </Box>
 
-                            <DisplayImages
-                                message={message}
+                            <DisplayMedia
+                                Media={message.media_files}
                                 handleOpen={handleOpen}
-                            />
-
-                            <VideoDisplay
-                                message={message}
                             />
 
                             <Typography

@@ -33,10 +33,14 @@ const MainPannelTwo = () => {
             }
 
             const newTimerId = setTimeout(() => SendData(
-                "POST", "/api/chat/search/message/", {
-                    message: trimmedSearchValue,
-                    chatroom: chatRoom
-                }
+                "POST",
+                "/api/chat/search/message/",
+                JSON.stringify(
+                    {
+                        message: trimmedSearchValue,
+                        chatroom: chatRoom
+                    }
+                )
             ).then((data) => {
                 if (data !== "No user found") {
                     setFoundMessages(data);
@@ -72,7 +76,7 @@ const MainPannelTwo = () => {
                 <MessagesOptions
                     handleOpen={handleOpen}
                 /> :
-                <MessagesFound 
+                <MessagesFound
                     messages={FoundMessages}
                     SearchValue={SearchValue}
                 />

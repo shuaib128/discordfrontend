@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Box } from '@mui/system';
 import MessageInputBox from '../components/Message/MessageDisplay/MessageInputBox'
+import { motion } from "framer-motion"
 import MessageTop from '../components/Message/MessageTop';
 import { useSelector, useDispatch } from 'react-redux';
 import SendData from '../utilits/Data/SendData';
@@ -11,17 +12,17 @@ import { resetMessages } from '../redux/Messages/MessagesActions';
 import { GetToken } from '../utilits/Token/GetToken';
 import { BackendLinkChat } from '../utilits/BackendLink';
 import ChatMessages from '../components/SkalitonLoader/ChatMessages';
-import { resizeImageFile } from '../utilits/Compression/imageCompress';
 import { getUser } from '../redux/Profile/ProfileActions';
 import ImagePreview from '../components/Message/MessageDisplay/ImagePreview';
 import Connected from '../components/ConnectionStatus/Connected';
 import Connecting from '../components/ConnectionStatus/Connecting';
 import Disconnected from '../components/ConnectionStatus/Disconnected';
-import SendingFileLoading from '../components/Message/Image/SendingFileLoading';
-import VideoSendingProgress from '../components/Message/Video/VideoSendingProgress';
-import { sendVideoChunks } from '../components/Message/Video/sendVideoChunks';
 import { useGetLatestChatUser } from '../components/Message/GetLatestChatUser';
 import { useGetPreviousChats } from '../components/Message/GetPreviousChats';
+import { transformedData } from '../components/Message/FileTransfer/transformedData';
+import { storeDataInIndexedDB } from '../components/Message/FileTransfer/indexedDB';
+import { transferFiles } from '../components/Message/FileTransfer/transferFiles';
+import PostUploadingProgress from '../components/Message/FileTransfer/PostUploadingProgress/PostUploadingProgress';
 
 function Home() {
     const { getLatestChatUser } = useGetLatestChatUser();
@@ -41,17 +42,20 @@ function Home() {
     const Messages = useSelector(state => state.SelectedUser.Messages)
     const [Message, setMessage] = useState("")
     const [Loading, setLoading] = useState(false)
-    const [File, setFile] = useState([]);
-    const [VideoFile, setVideoFile] = useState([]);
+    const [Files, setFiles] = useState([]);
+    const FilesRef = useRef(Files);
     const [SendingFile, setSendingFile] = useState(false)
-    const [SendingVideoFile, setSendingVideoFile] = useState(false)
-    const [VideoFileSentPercentage, setVideoFileSentPercentage] = useState(0)
-    const [VideoFileName, setVideoFileName] = useState("")
+    const [Progress, setProgress] = useState(0)
 
     //Chech who you were talking to from localhost
     useEffect(() => {
         getLatestChatUser()
     }, [])
+
+    /**Keep the files updated */
+    useEffect(() => {
+        FilesRef.current = Files;
+    }, [Files]);
 
     //Get chats from the chat room
     useEffect(() => {
@@ -130,40 +134,23 @@ function Home() {
 
     //Send the message onclick
     const handleSubmit = () => {
-        if (File.length !== 0) {
-            setSendingFile(true)
-        }
         /**
-         * Add al data to data variable
+         * Add all data to data variable
          */
         var data = {
             type: "message",
             "message": Message,
-            "user": User,
-            "image_length": File.length,
-            "video_length": VideoFile.length
-        }
-        for (const file in File) {
-            data[`img${file}`] = File[file]
-        }
-        for (const video in VideoFile) {
-            data[`vid${video}`] = VideoFile[video]
+            "user": User
         }
 
         setMessage("")
         if (socket.readyState === WebSocket.OPEN) {
             /**
          * Send it to backend &
-         * setMessage and setFile empty
+         * setMessage and setFiles empty
          */
             socket.binaryType = "blob";
             socket.send(JSON.stringify(data));
-
-            /**Get responce that data has been sent */
-            socket.addEventListener('message', (event) => {
-                setSendingFile(false)
-            });
-            setFile([])
 
             /**
              * Send data to friend list
@@ -172,9 +159,11 @@ function Home() {
                 SendData(
                     "POST",
                     "/api/users/user/friends/add/",
-                    {
-                        selectedUser: SelectedUser,
-                    }
+                    JSON.stringify(
+                        {
+                            selectedUser: SelectedUser,
+                        }
+                    )
                 ).then((data) => {
                     dispatch(getUser(data))
                 })
@@ -194,7 +183,7 @@ function Home() {
                 }
             }
         } else {
-            dispatch(getMessages([...Messages, data]))
+            dispatch(getMessages([data]));
             // Add message to unsent messages array
             setUnsentMessages([...unsentMessages, data]);
         }
@@ -252,97 +241,70 @@ function Home() {
         try {
             socket.addEventListener('message', (event) => {
                 const message = event.data;
-
-                dispatch(getMessages([...Messages, JSON.parse(message).chat]))
+                const parsedMessage = JSON.parse(message).chat;
+                dispatch(getMessages([parsedMessage]));
+                sendFiles(message)
             });
         } catch (error) {
 
         }
     }, [socket, User, SelectedUser])
 
-
-    //Handle file change
+    /**Handle file upload */
     const handleFileChange = async (e) => {
-        const files = e.target.files;
-        const newFiles = [];
-
-        /**Resize the images and add it to Files useState */
-        for (let i = 0; i < files.length; i++) {
-            const resizedFile = await resizeImageFile(files[i], 840, 680);
-
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(resizedFile);
-
-            fileReader.addEventListener('load', (event) => {
-                const dataUrl = event.target.result;
-                newFiles.push(dataUrl);
-
-                if (newFiles.length === files.length) {
-                    setFile([...File, ...newFiles]);
-                }
-            });
-        }
-    };
-
-
-    /**Handle video file input */
-    const handleVideoInputChange = async (event) => {
-        setSendingVideoFile(true)
-        //let the server know videos are comming
-        socket.send(JSON.stringify({
-            type: "incoming",
-            "user": User,
-        }));
-
-        const files = event.target.files;
-
-        // loop through each file and send it to sendVideoChunks
-        for (let i = 0; i < files.length; i++) {
-            setVideoFileSentPercentage(0)
-            const file = files[i];
-            var filename = file.name
-            setVideoFileName(filename)
-
-            // Wrap the FileReader logic in a Promise
-            await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsArrayBuffer(file);
-
-                reader.onloadend = async () => {
-                    const videoBuffer = new Uint8Array(reader.result).buffer;
-
-                    socket.binaryType = "arraybuffer";
-                    if (socket.readyState === WebSocket.OPEN) {
-                        socket.send(JSON.stringify({
-                            type: "title",
-                            filename,
-                        }));
-                    }
-
-                    // Pass the resolve function to sendVideoChunks
-                    sendVideoChunks(
-                        filename,
-                        socket,
-                        videoBuffer,
-                        0,
-                        resolve,
-                        setVideoFileSentPercentage
-                    );
-                };
-            });
-        }
-        //let the server know all video came
-        socket.send(JSON.stringify({ type: "allvideocame", }));
-        setSendingVideoFile(false)
+        const newFiles = e.target.files;
+        setFiles(prevFiles => [...prevFiles, ...newFiles]);
     }
 
-    /**
-     * Remove Image Item when clicked delete button
-     */
-    const removeItem = (index) => {
-        const newItems = File.filter((_, i) => i !== index);
-        setFile(newItems);
-    };
+    /**Send Media Files */
+    const sendFiles = async (message) => {
+        /**Start uploading files */
+        setSendingFile(true)
+
+        /**Clear media input */
+        const mediaField = document.querySelector(".media-fields")
+        mediaField.value = ''
+
+        const message_json = JSON.parse(message).chat
+        const Files = FilesRef.current
+        if (Files.length === 0) return;
+
+        /**Save it in a way that is uploadable even after refresh */
+        const transformedFiles = await transformedData(
+            Files,
+            message_json.id,
+            message_json.sender.username
+        );
+
+        /**Save data in indexedDB */
+        const mediaData = [
+            { id: 1, files: transformedFiles },
+            { id: 2, post_id: message_json.id },
+            {
+                id: 3,
+                author_username: message_json.sender.username,
+                chatroom: GetChatroom(User, SelectedUser)
+            },
+        ];
+        await storeDataInIndexedDB(mediaData)
+        setFiles([])
+
+        /**Run transferFiles in the background */
+        setTimeout(async () => {
+            try {
+                await transferFiles(
+                    setProgress,
+                    setSendingFile
+                ).then(() => {
+                    setSendingFile(false)
+                })
+            } catch (error) {
+                /**Handle any errors that occurred during the transfer */
+                console.error(error);
+            }
+        }, 0);
+    }
+
 
     return (
         <Box
@@ -371,26 +333,34 @@ function Home() {
 
                     {File.length !== 0 ?
                         <ImagePreview
-                            File={File}
-                            removeItem={removeItem}
+                            File={Files}
+                            setFile={setFiles}
                         /> :
                         <Box></Box>
                     }
 
-                    {SendingFile && <SendingFileLoading />}
-                    {
-                        SendingVideoFile &&
-                        <VideoSendingProgress
-                            VideoFileName={VideoFileName}
-                            VideoFileSentPercentage={VideoFileSentPercentage}
-                        />
-                    }
+                    <motion.div
+                        style={{
+                            width: "calc(100% - 20px)",
+                            position: "absolute",
+                            top: "-28px",
+                            margin: "0px 10px"
+                        }}
+                        className="post-progress"
+                        animate={SendingFile ? "open" : "closed"}
+                        variants={{
+                            open: { opacity: 1, height: "auto" },
+                            closed: { opacity: 0, height: 0 },
+                        }}
+                    >
+
+                    </motion.div>
                     <MessageInputBox
+                        File={Files}
                         Message={Message}
                         setMessage={setMessage}
                         handleSubmit={handleSubmit}
                         handleFileChange={handleFileChange}
-                        handleVideoInputChange={handleVideoInputChange}
                     />
                 </Box> :
                 <Box></Box>

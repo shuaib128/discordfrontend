@@ -45,11 +45,13 @@ const PrifileImageTop = () => {
         SendData(
             "PATCH",
             "/api/users/user/update/",
-            {
-                bio: UserNote,
-                profile_picture: ProfileImage,
-            }
-        ).then((data) => {})
+            JSON.stringify(
+                {
+                    bio: UserNote,
+                    profile_picture: ProfileImage,
+                }
+            )
+        ).then((data) => { })
     }
 
     //Handle file change

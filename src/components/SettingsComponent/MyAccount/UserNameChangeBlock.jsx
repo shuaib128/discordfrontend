@@ -20,9 +20,11 @@ const UserNameChangeBlock = ({ Lavel, Value, setValue }) => {
             SendData(
                 "PUT",
                 "/api/users/user/update/",
-                {
-                    bio: Value
-                }
+                JSON.stringify(
+                    {
+                        bio: Value
+                    }
+                )
             ).then((data) => {})
         }
     }

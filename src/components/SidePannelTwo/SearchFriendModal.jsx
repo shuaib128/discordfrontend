@@ -31,7 +31,9 @@ const SearchFriendModal = (props) => {
         }
 
         const newTimerId = setTimeout(() => SendData(
-            "POST", "/api/users/user/search/", User
+            "POST", 
+            "/api/users/user/search/", 
+            JSON.stringify(User)
         ).then((data) => {
             if (data !== "No user found") {
                 setUsers(data);

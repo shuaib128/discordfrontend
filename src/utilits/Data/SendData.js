@@ -17,7 +17,7 @@ export default function SendData(METHOD, URL, DATA) {
             method: METHOD,
             headers: myHeaders,
             redirect: 'follow',
-            body: JSON.stringify(DATA)
+            body: DATA
         };
 
         return fetch(`${BackendLink}${URL}`, requestOptions)
